@@ -19,23 +19,19 @@ program
   .option("-a", "scrape assignments", true)
   .option("-m", "scrape modules", false)
   .action(async (url, options) => {
-    console.log(url);
-    console.log(options);
-    const dir = options.output;
+    console.log(`*** SCRAPING COURSE FROM ${url} ***`);
+    console.log(`FLAGS: ${JSON.stringify(options)}`);
 
+    const dir = options.output;
     if (fs.existsSync(dir))
       fs.rmSync(dir, { directory: true, recursive: true });
     fs.mkdirSync(dir);
 
-    if (process.env.COOKIE_SESSION_VALUE === "VALUE")
-      throw new Error("COOKIE_SESSION_VALUE not set");
-
     const browser = await puppeteer.launch({ headless: "new" });
-
     if (options.a) await scrapers.scrapeAssignments(browser, cookies, url, dir);
 
     browser.close();
-    console.log("DONE!");
+    console.log("*** SCRAPING COMPLETE ***");
   });
 
 program.parse();
