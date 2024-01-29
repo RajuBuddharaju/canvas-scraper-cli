@@ -32,6 +32,7 @@ const exported = {
       const match = contentDisposition.match(/filename="(.+?)"/);
       if (match) {
         filename = match[1];
+        filename = this.stripInvalid(filename);
       }
     }
 
