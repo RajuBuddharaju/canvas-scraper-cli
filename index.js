@@ -22,13 +22,16 @@ program
     console.log(`*** SCRAPING COURSE FROM ${url} ***`);
     console.log(`FLAGS: ${JSON.stringify(options)}`);
 
+    // create output directory
     const dir = options.output;
     if (fs.existsSync(dir))
       fs.rmSync(dir, { directory: true, recursive: true });
     fs.mkdirSync(dir);
 
+    // scrape course
     const browser = await puppeteer.launch({ headless: "new" });
-    if (options.a) await scrapers.scrapeAssignments(browser, cookies, url, dir);
+    if (options.a)
+      await scrapers.scrapeAssignments(browser, cookies.default, url, dir);
 
     browser.close();
     console.log("*** SCRAPING COMPLETE ***");
