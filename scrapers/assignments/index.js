@@ -69,6 +69,13 @@ const scrapeAssignments = async (browser, cookies, url, dir) => {
 
   await page.screenshot({ path: `${dir}/page_preview.png` });
 
+  // wait for grades to load in
+  let submissionsURL = `${url.replace(
+    "/courses",
+    "/api/v1/courses"
+  )}/students/submissions?per_page=50`;
+  await page.waitForResponse(submissionsURL);
+
   // get list of assignments
   let assignments;
   try {
@@ -79,6 +86,7 @@ const scrapeAssignments = async (browser, cookies, url, dir) => {
     await page.close();
     return;
   }
+  console.log(assignments);
 
   // scrape assignments
   let problematicTotal = {};

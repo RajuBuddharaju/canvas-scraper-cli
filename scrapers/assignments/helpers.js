@@ -25,7 +25,7 @@ const exported = {
 
         return { url, name, grade };
       });
-      return assignmentList;
+      return assignmentList.filter((a) => !a.url.includes("reviewee_id="));
     });
   },
 
@@ -75,6 +75,23 @@ const exported = {
     return await helpers.downloadFiles(dLinks, cookies, dir);
   },
 
+  async scrapeSubmissionDetails(page, cookies, dir) {
+    let link = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll(".content a"))
+        .map((a) => a.href)
+        .filter((url) => url.includes("/submissions/"))
+        .filter((url) => !url.includes("?download"))[0];
+    });
+    if (!link) return false;
+
+    let newPage = await helpers.newPage(page.browser(), cookies, link);
+    await newPage.pdf({
+      path: `${dir}/.SUBMISSIONDETAILS.pdf`,
+      format: "Letter",
+    });
+    return true;
+  },
+
   /**
    * Scrapes an assignment submission
    * @param {page} page page to scrape from
@@ -83,6 +100,13 @@ const exported = {
    * @returns {Promise<Array<string>>} array of problematic files
    */
   async scrapeSubmission(page, cookies, dir) {
+    // print submission details
+    try {
+      await this.scrapeSubmissionDetails(page, cookies, dir);
+    } catch (e) {
+      console.log("ERROR: COULD NOT SCRAPE SUBMISSION DETAILS");
+    }
+
     // gather links to files submitted by student
     let sLinks = await page.evaluate(() => {
       return Array.from(document.querySelectorAll(".content a"))
@@ -104,8 +128,10 @@ const exported = {
   async scrapeComments(page, dir) {
     let comments = await page.evaluate(() => {
       let comments = document.querySelector(".content > .comments");
+      if (!comments) return null;
       return comments.innerText;
     });
+    if (!comments) return false;
     await helpers.writeFile(dir, ".COMMENTS.txt", comments);
     return true;
   },
