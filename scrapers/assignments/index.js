@@ -66,8 +66,10 @@ const scrapeAssignments = async (browser, cookies, url, dir) => {
   console.log("=== SCRAPING ASSIGNMENTS ===");
   fs.mkdirSync(`${dir}/ASSIGNMENTS`);
   const page = await helpers.newPage(browser, cookies, `${url}/assignments`);
-
-  await page.screenshot({ path: `${dir}/page_preview.png` });
+  await page.pdf({
+    path: `${dir}/ASSIGNMENTS/.ASSIGNMENTS.pdf`,
+    format: "Letter",
+  });
 
   // wait for grades to load in
   let submissionsURL = `${url.replace(
@@ -86,7 +88,6 @@ const scrapeAssignments = async (browser, cookies, url, dir) => {
     await page.close();
     return;
   }
-  console.log(assignments);
 
   // scrape assignments
   let problematicTotal = {};

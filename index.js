@@ -1,6 +1,7 @@
 import fs from "fs";
 import { Command } from "commander";
 import puppeteer from "puppeteer";
+import helpers from "./scrapers/helpers.js";
 
 import scrapers from "./scrapers/index.js";
 import * as cookies from "./cookies.json" assert { type: "json" };
@@ -16,7 +17,7 @@ program
     "Course Homepage URL (e.g. https://<school_domain>/courses/<course_id>)"
   )
   .option("-o, --output <dir_name>", "output directory name", "course")
-  .option("-a", "scrape assignments", true)
+  .option("-a", "scrape assignments", false)
   .option("-m", "scrape modules", false)
   .action(async (url, options) => {
     console.log(`*** SCRAPING COURSE FROM ${url} ***`);
@@ -30,8 +31,14 @@ program
 
     // scrape course
     const browser = await puppeteer.launch({ headless: "new" });
+    const page = await helpers.newPage(browser, cookies.default, url);
+    await page.pdf({ path: `${dir}/.HOMEPAGE.pdf`, format: "Letter" });
+    page.close();
+
     if (options.a)
       await scrapers.scrapeAssignments(browser, cookies.default, url, dir);
+    if (options.m)
+      await scrapers.scrapeModules(browser, cookies.default, url, dir);
 
     browser.close();
     console.log("*** SCRAPING COMPLETE ***");
