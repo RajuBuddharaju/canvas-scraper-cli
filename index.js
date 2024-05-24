@@ -4,41 +4,47 @@ import puppeteer from "puppeteer";
 import helpers from "./scrapers/helpers.js";
 
 import scrapers from "./scrapers/index.js";
-import * as cookies from "./cookies.json" assert { type: "json" };
 
 const program = new Command();
-program.name("canvas-scraper").description("Scrape data from a canvas course");
-
 program
-  .command("scrape")
+  .name("canvas-scraper")
   .description("Scrape data from a canvas course")
   .argument(
     "<url>",
     "Course Homepage URL (e.g. https://<school_domain>/courses/<course_id>)"
   )
-  .option("-o, --output <dir_name>", "output directory name", "course")
+  .option("-o, --output <dir_name>", "output directory name", "courses/course")
+  .option("-c, --cookies <path>", "path to cookies file", "cookies.json")
   .option("-a", "scrape assignments", false)
   .option("-m", "scrape modules", false)
   .action(async (url, options) => {
     console.log(`*** SCRAPING COURSE FROM ${url} ***`);
     console.log(`FLAGS: ${JSON.stringify(options)}`);
 
+    // read cookies
+    let cookies = options.cookies;
+    try {
+      cookies = JSON.parse(fs.readFileSync("cookies.json"));
+    } catch (e) {
+      console.log("ERROR: COULD NOT READ COOKIES");
+      console.log(e);
+      process.exit(1);
+    }
+
     // create output directory
     const dir = options.output;
     if (fs.existsSync(dir))
       fs.rmSync(dir, { directory: true, recursive: true });
-    fs.mkdirSync(dir);
+    fs.mkdirSync(dir, { recursive: true });
 
     // scrape course
     const browser = await puppeteer.launch({ headless: "new" });
-    const page = await helpers.newPage(browser, cookies.default, url);
+    const page = await helpers.newPage(browser, cookies, url);
     await page.pdf({ path: `${dir}/.HOMEPAGE.pdf`, format: "Letter" });
     page.close();
 
-    if (options.a)
-      await scrapers.scrapeAssignments(browser, cookies.default, url, dir);
-    if (options.m)
-      await scrapers.scrapeModules(browser, cookies.default, url, dir);
+    if (options.a) await scrapers.scrapeAssignments(browser, cookies, url, dir);
+    if (options.m) await scrapers.scrapeModules(browser, cookies, url, dir);
 
     browser.close();
     console.log("*** SCRAPING COMPLETE ***");

@@ -18,15 +18,24 @@ async function scrapeModule(browser, cookies, dir, sectionName, module) {
       .filter((url) => url.includes("download?download"));
   });
 
+  let problematic = [];
   for (let link of dLinks) {
-    await helpers.downloadFile(
-      link,
-      cookies,
-      `${dir}/MODULES/${sectionName}/${moduleName}`,
-      "fileDownload"
-    );
+    try {
+      problematic = problematic.concat(
+        await helpers.downloadFile(
+          link,
+          cookies,
+          `${dir}/MODULES/${sectionName}/${moduleName}`,
+          "fileDownload"
+        )
+      );
+    } catch (e) {
+      console.log(`ERROR: MODULE ${module.name} | COULD NOT DOWNLOAD FILE`);
+      console.log(e);
+    }
   }
   modulePage.close();
+  return problematic;
 }
 
 async function scrapeModuleSection(browser, cookies, dir, section) {
@@ -34,7 +43,12 @@ async function scrapeModuleSection(browser, cookies, dir, section) {
   let sectionName = helpers.stripInvalid(section.name);
   fs.mkdirSync(`${dir}/MODULES/${sectionName}`);
   for (let module of section.modules) {
-    await scrapeModule(browser, cookies, dir, sectionName, module);
+    try {
+      await scrapeModule(browser, cookies, dir, sectionName, module);
+    } catch (e) {
+      console.log(`FAILURE: MODULE ${module.name} | COULD NOT SCRAPE`);
+      console.log(e);
+    }
   }
 }
 
@@ -52,6 +66,13 @@ async function scrapeModules(browser, cookies, url, dir) {
       console.log(`ERROR: MODULE SECTION ${section.name} | COULD NOT SCRAPE`);
       console.log(e);
     }
+  }
+
+  try {
+    mHelpers.printSummary(moduleSections, problematicTotal);
+  } catch (e) {
+    console.log("FAILURE: COULD NOT PRINT SUMMARY");
+    console.log(e);
   }
 
   page.close();

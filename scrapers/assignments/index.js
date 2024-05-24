@@ -76,7 +76,13 @@ const scrapeAssignments = async (browser, cookies, url, dir) => {
     "/courses",
     "/api/v1/courses"
   )}/students/submissions?per_page=50`;
-  await page.waitForResponse(submissionsURL);
+  try {
+    await page.waitForResponse(submissionsURL, { timeout: 5000 });
+  } catch (e) {
+    console.log(
+      "WARNING: COULD NOT GET SUBMISSIONS REQUEST, CONTINUING ANYWAY..."
+    );
+  }
 
   // get list of assignments
   let assignments;
