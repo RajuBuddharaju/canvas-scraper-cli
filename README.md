@@ -14,14 +14,14 @@ The easiest way to do this is by logging into Canvas in your browser and using a
 
 ### Using Pre-Compiled Release
 
-First, download the latest version from the [Releases]() page. Extract the ZIP file and copy the respective executable for your operating system to your desired directory.
+First, download the latest version from the [Releases](https://github.com/xxmistacruzxx/canvas-scraper/releases) page. Extract the ZIP file and copy the respective executable for your operating system to your desired directory.
 
 To use the executable, simply navigate to the directory in a shell and call the executable.
 
 e.g Windows<br/>
 `./canvas-scraper.exe`
 
-## Using Source Code
+### Using Source Code
 
 You will need [NodeJS](https://nodejs.org/en) and [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). After, you can simply run the entry file directly...
 
