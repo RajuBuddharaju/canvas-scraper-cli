@@ -14,7 +14,9 @@ The easiest way to do this is by logging into Canvas in your browser and using a
 
 ### Using Pre-Compiled Release
 
-First, download the latest version from the [Releases](https://github.com/xxmistacruzxx/canvas-scraper/releases) page. Extract the ZIP file and copy the respective executable for your operating system to your desired directory.
+First, download the latest version from the [Releases](https://github.com/xxmistacruzxx/canvas-scraper/releases) page and extract the ZIP file.
+
+Inside the extracted folder, navigate to the "dist" folder and copy the executable for your respective operating system into the main directory of the extracted folder.
 
 To use the executable, simply navigate to the directory in a shell and call the executable.
 
@@ -23,7 +25,13 @@ e.g Windows<br/>
 
 ### Using Source Code
 
-You will need [NodeJS](https://nodejs.org/en) and [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). After, you can simply run the entry file directly...
+You will need [NodeJS](https://nodejs.org/en) and [NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+Once installed, download the project dependencies using...
+
+`npm i`
+
+After, you can simply run the entry file directly...
 
 `node index.js ...`
 
@@ -49,7 +57,7 @@ Options:
   -h, --help               display help for command
 ```
 
-You must use the 'a' and/or 'm' flags, otherwise not data will be scraped.
+You must use the 'a' and/or 'm' flags, otherwise no data will be scraped.
 
 ## Video Tutorial
 
