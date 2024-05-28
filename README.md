@@ -61,4 +61,6 @@ You must use the 'a' and/or 'm' flags, otherwise no data will be scraped.
 
 ## Video Tutorial
 
-Coming soon...
+Watch the video below for a quick guide on how to download and use the CLI!
+
+[![Video Tutorial Thumbnail](https://img.youtube.com/vi/LkUe-pfXVFE/0.jpg)](https://www.youtube.com/watch?v=LkUe-pfXVFE)

@@ -29,17 +29,20 @@ const exported = {
   async printSummary(modulesections, problematic) {
     console.log("--- MODULES SCRAPING SUMMARY ---");
     console.log(`TOTAL MODULE SECTIONS: ${modulesections.length}`);
-    moduleCount = modulesections.map((section) => {
+    let moduleCount = modulesections.map((section) => {
       return section.modules.length;
     });
     console.log(`TOTAL MODULES: ${moduleCount.reduce((a, b) => a + b, 0)}`);
 
     if (Object.keys(problematic).length > 0) {
       console.log("WARNING: Some files could not be downloaded");
-      for (let module of Object.keys(problematic)) {
-        console.log(`MODULE ${module}`);
-        for (let file of problematic[module]) {
-          console.log(`  ${file}`);
+      for (let section in problematic) {
+        console.log(`${section}`);
+        for (let module in problematic[section]) {
+          console.log(`  ${module}`);
+          for (let file of problematic[section][module]) {
+            console.log(`    ${file}`);
+          }
         }
       }
     }

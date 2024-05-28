@@ -19,21 +19,19 @@ async function scrapeModule(browser, cookies, dir, sectionName, module) {
   });
 
   let problematic = [];
-  for (let link of dLinks) {
-    try {
-      problematic = problematic.concat(
-        await helpers.downloadFile(
-          link,
-          cookies,
-          `${dir}/MODULES/${sectionName}/${moduleName}`,
-          "fileDownload"
-        )
-      );
-    } catch (e) {
-      console.log(`ERROR: MODULE ${module.name} | COULD NOT DOWNLOAD FILE`);
-      console.log(e);
-    }
+  try {
+    problematic = problematic.concat(
+      await helpers.downloadFiles(
+        dLinks,
+        cookies,
+        `${dir}/MODULES/${sectionName}/${moduleName}`
+      )
+    );
+  } catch (e) {
+    console.log(`ERROR: MODULE ${module.name} | COULD NOT DOWNLOAD FILE`);
+    console.log(e);
   }
+
   modulePage.close();
   return problematic;
 }
@@ -42,14 +40,23 @@ async function scrapeModuleSection(browser, cookies, dir, section) {
   console.log(`MODULE SECTION: ${section.name}`);
   let sectionName = helpers.stripInvalid(section.name);
   fs.mkdirSync(`${dir}/MODULES/${sectionName}`);
+  let problematicTotal = {};
   for (let module of section.modules) {
     try {
-      await scrapeModule(browser, cookies, dir, sectionName, module);
+      let problematic = await scrapeModule(
+        browser,
+        cookies,
+        dir,
+        sectionName,
+        module
+      );
+      if (problematic.length > 0) problematicTotal[module.name] = problematic;
     } catch (e) {
       console.log(`FAILURE: MODULE ${module.name} | COULD NOT SCRAPE`);
       console.log(e);
     }
   }
+  return problematicTotal;
 }
 
 async function scrapeModules(browser, cookies, url, dir) {
@@ -59,9 +66,18 @@ async function scrapeModules(browser, cookies, url, dir) {
   await page.pdf({ path: `${dir}/MODULES/.MODULES.pdf`, format: "Letter" });
 
   const moduleSections = await mHelpers.getModules(page);
+
+  let problematicTotal = {};
   for (let section of moduleSections) {
     try {
-      await scrapeModuleSection(browser, cookies, dir, section);
+      let problematic = await scrapeModuleSection(
+        browser,
+        cookies,
+        dir,
+        section
+      );
+      if (Object.keys(problematic).length > 0)
+        problematicTotal[section.name] = problematic;
     } catch (e) {
       console.log(`ERROR: MODULE SECTION ${section.name} | COULD NOT SCRAPE`);
       console.log(e);
