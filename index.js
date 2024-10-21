@@ -95,6 +95,14 @@ const flagDef = [
     flags: "-q",
     description: "scrape quizzes",
   },
+  {
+    type: "confirm",
+    name: "an",
+    message: "Do you want to scrape announcements?",
+    default: false,
+    flags: "-an",
+    description: "scrape announcements",
+  },
 ];
 
 const program = new Command();
@@ -149,7 +157,7 @@ program.action(async (url, options) => {
   await page.pdf({ path: `${dir}/.HOMEPAGE.pdf`, format: "Letter" });
   page.close();
 
-  const toScrape = { a: options.a, m: options.m, q: options.q };
+  const toScrape = { a: options.a, m: options.m, q: options.q , an: options.An };
   if (Object.values(toScrape).every((v) => !v)) {
     helpers.print("NOTE", "FLAGS", "No flags set. Scraping all...", 0);
     for (const key in toScrape) toScrape[key] = true;
@@ -157,6 +165,7 @@ program.action(async (url, options) => {
   if (toScrape.a) await scrapers.scrapeAssignments(browser, cookies, url, dir);
   if (toScrape.m) await scrapers.scrapeModules(browser, cookies, url, dir);
   if (toScrape.q) await scrapers.scrapeQuizzes(browser, cookies, url, dir);
+  if (toScrape.an) await scrapers.scrapeAnnouncements(browser, cookies, url, dir);
 
   browser.close();
   console.log(`*** FINISHED SCRAPING ${url} ***`);
